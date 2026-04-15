@@ -73,4 +73,3 @@ All processing is done **100% locally** on your machine. No videos are ever uplo
 
 - Built with **PyQt6** and **OpenCV**.
 - Packaged with **PyInstaller**.
-- Created by your AI assistant, Manus.
