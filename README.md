@@ -1,75 +1,116 @@
-# ASCII Video Player — Standalone Windows App
+# ASCII Video Player 🎬
 
-A retro-style Windows application that converts any video file into real-time ASCII art. Watch your favorite movies, clips, or home videos rendered in a grid of text characters!
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://www.microsoft.com/windows)
 
----
-
-## Features
-
-- **Real-time ASCII Conversion:** Converts video frames into a grid of ASCII characters based on brightness levels.
-- **Multiple Color Modes:** Toggle between:
-  - **Matrix Green:** Classic hacker aesthetic.
-  - **Grayscale:** Traditional black and white.
-  - **Full Color:** For a more modern look.
-- **Drag and Drop:** Simply drag any video file onto the window to start playing.
-- **Supported Formats:** Works with `.mp4`, `.avi`, `.mov`, `.mkv`, and more.
-- **Standalone EXE:** Once built, it's a single file you can move anywhere.
+A retro-style Windows application that converts any video file into real-time ASCII art. Watch your favorite movies, clips, or home videos rendered in a grid of text characters with synchronized audio support.
 
 ---
 
-## How to Build the EXE
+## ✨ Features
 
-1.  Extract this folder on your Windows machine.
-2.  Ensure **Python 3.8 or later** is installed ([python.org](https://www.python.org/downloads/)).
-3.  Double-click **`BUILD_ASCII.bat`**.
-4.  Wait for the build process to complete (this will install `PyQt6`, `OpenCV`, and `PyInstaller` automatically).
-5.  Once finished, your standalone program will be in the **`dist/`** folder as `ASCIIPlayer.exe`.
-
----
-
-## How to Use
-
-- **Drag and Drop:** Drag a video file into the app.
-- **"Open Video" Button:** Select a file using the Windows file explorer.
-- **"Switch Color" Button:** Toggle through the different color modes.
+- **Real-time ASCII Conversion:** High-performance conversion of video frames into ASCII characters based on luminance.
+- **Multiple Color Modes:**
+  - 🟢 **Matrix Green:** The classic "hacker" aesthetic.
+  - ⚪ **Grayscale:** Traditional high-contrast black and white.
+  - 🌈 **True Color:** Modern full-color rendering using HTML spans.
+- **Audio Synchronization:** Integrated audio playback synced with the ASCII stream.
+- **User-Friendly Interface:** Drag-and-drop support and a clean, minimalist UI built with PyQt6.
+- **Standalone Executable:** Portable single-file EXE for easy distribution.
 
 ---
 
-## Pro Command Line Usage 💻
+## 🚀 Quick Start
 
-You can launch the player directly from your terminal (CMD or PowerShell) using the built-in command line arguments:
+### For Users (Download EXE)
+1. Go to the [Releases](https://github.com/Cheez-Noodlez1/ascii-video-player/releases) page.
+2. Download `ASCIIPlayer.exe`.
+3. Run the application and drag any video file into the window!
+
+### For Developers (Source Code)
+
+#### Prerequisites
+- Python 3.8 or later
+- [OpenCV](https://opencv.org/)
+- [PyQt6](https://riverbankcomputing.com/software/pyqt/)
+
+#### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Cheez-Noodlez1/ascii-video-player.git
+   cd ascii-video-player
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run the application:
+   ```bash
+   python src/main.py
+   ```
+
+---
+
+## 🛠️ Building the Standalone EXE
+
+We provide a convenient build script for Windows:
+
+1. Double-click **`BUILD_ASCII.bat`**.
+2. The script will automatically:
+   - Verify your Python installation.
+   - Install required build tools (`PyInstaller`).
+   - Package the application into a single file.
+3. Find your standalone program in the **`dist/`** folder as `ASCIIPlayer.exe`.
+
+---
+
+## 💻 Command Line Usage
+
+Launch the player directly from your terminal with arguments:
 
 ```bash
 # Basic usage (defaults to Matrix Green)
 ASCIIPlayer.exe movie.mp4
 
-# Full Color mode (just add 'true')
+# Full Color mode
 ASCIIPlayer.exe movie.mp4 true
 ```
 
-### **To use it as `ascii-stream` from anywhere:**
-1.  Open the folder containing your built `ASCIIPlayer.exe`.
-2.  Rename the file to `ascii-stream.exe`.
-3.  Add the folder to your **Windows Environment Variables (PATH)**.
-4.  Now you can type `ascii-stream video.mp4 true` from any terminal!
+**Pro Tip:** Rename the EXE to `ascii-stream.exe` and add it to your System PATH to use it from anywhere!
 
 ---
 
-## Requirements (for building only)
+## 🤝 Contributing
 
-- **Windows 10 or 11**
-- **Python 3.8+**
-- **Internet Connection** (to download `OpenCV` and `PyQt6` during the build)
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ---
 
-## Privacy
+## 🛡️ Privacy & Security
 
-All processing is done **100% locally** on your machine. No videos are ever uploaded to any server.
+- **100% Local:** All video processing is performed locally on your machine.
+- **No Data Collection:** We do not collect, store, or transmit any user data or video content.
 
 ---
 
-## Credits
+## 📜 License
 
-- Built with **PyQt6** and **OpenCV**.
-- Packaged with **PyInstaller**.
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## 🙏 Credits
+
+- [PyQt6](https://www.riverbankcomputing.com/software/pyqt/) - Professional UI framework.
+- [OpenCV](https://opencv.org/) - Industry-standard computer vision library.
+- [PyInstaller](https://pyinstaller.org/) - Reliable application packaging.
+- [MoviePy](https://zulko.github.io/moviepy/) - Video editing and audio extraction.

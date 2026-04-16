@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ascii-video-player"
+version = "1.0.0"
+authors = [
+  { name="Cheez-Noodlez1", email="your-email@example.com" },
+]
+description = "A retro-style Windows application that converts any video file into real-time ASCII art."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Multimedia :: Video :: Display",
+]
+dependencies = [
+    "PyQt6>=6.4.0",
+    "opencv-python>=4.7.0",
+    "numpy>=1.24.0",
+    "moviepy>=1.0.3",
+    "pygame>=2.1.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Cheez-Noodlez1/ascii-video-player"
+"Bug Tracker" = "https://github.com/Cheez-Noodlez1/ascii-video-player/issues"
+
+[project.scripts]
+ascii-player = "ascii_video_player.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["*"]
