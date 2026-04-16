@@ -81,6 +81,13 @@ ASCIIPlayer.exe movie.mp4 true
 # Terminal mode (for videos or HTML)
 ASCIIPlayer.exe movie.mp4 --terminal
 ASCIIPlayer.exe index.html --terminal
+
+# 🚀 Run instantly with curl (no installation needed)
+# For local files:
+curl -sSL https://raw.githubusercontent.com/Cheez-Noodlez1/ascii-video-player/master/run_ascii.sh | bash -s -- movie.mp4
+
+# For remote HTML pages:
+curl -sSL https://raw.githubusercontent.com/Cheez-Noodlez1/ascii-video-player/master/run_ascii.sh | bash -s -- https://example.com
 ```
 
 **Pro Tip:** Rename the EXE to `ascii-stream.exe` and add it to your System PATH to use it from anywhere!

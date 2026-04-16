@@ -257,20 +257,31 @@ class ASCIIVideoPlayer(QMainWindow):
 
 
 def run_in_terminal(file_path: str):
-    """Render the file directly to the terminal."""
-    if not os.path.exists(file_path):
+    """Render the file or URL directly to the terminal."""
+    # Check if it's a URL
+    is_url = file_path.startswith(('http://', 'https://'))
+    
+    if not is_url and not os.path.exists(file_path):
         print(f"File not found: {file_path}")
         return
 
-    if file_path.lower().endswith(('.html', '.htm')):
+    if is_url or file_path.lower().endswith(('.html', '.htm')):
         try:
             import html2text
-            with open(file_path, 'r', encoding='utf-8') as f:
-                html_content = f.read()
+            import requests
+            
+            if is_url:
+                response = requests.get(file_path)
+                response.raise_for_status()
+                html_content = response.text
+            else:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    html_content = f.read()
+            
             h = html2text.HTML2Text()
             print(h.handle(html_content))
         except ImportError:
-            print("Error: html2text not installed. Run 'pip install html2text'")
+            print("Error: html2text or requests not installed. Run 'pip install html2text requests'")
         except Exception as e:
             print(f"Error reading HTML: {e}")
         return
