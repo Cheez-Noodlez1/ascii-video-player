@@ -68,6 +68,9 @@ curl -sSL https://raw.githubusercontent.com/Cheez-Noodlez1/ascii-video-player/ma
 ## 📖 Detailed Installation & Troubleshooting
 For more in-depth instructions, platform-specific details, and common troubleshooting tips, please refer to our **[Installation & Troubleshooting Guide](INSTALL_GUIDE.md)**.
 
+## 🖼️ Visual Guide: Live Website Streaming
+Check out our **[Step-by-Step Visual Guide](docs/STREAMING_GUIDE.md)** to see the live website streaming feature in action!
+
 ---
 
 ## 🛠️ Building the Standalone EXE
