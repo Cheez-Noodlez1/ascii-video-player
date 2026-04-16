@@ -53,10 +53,10 @@ copy /Y "src\main.py" "%INSTALL_DIR%\ascii-player.py" >nul
 
 :: 5. Create a launcher batch file
 echo [3/4] Creating system launcher...
-(
-echo @echo off
-echo python "%INSTALL_DIR%\ascii-player.py" %%*
-) > "%INSTALL_DIR%\ascii-player.bat"
+:: We use a temporary file to avoid issues with nested parentheses in echo
+set "LAUNCHER_PATH=%INSTALL_DIR%\ascii-player.bat"
+echo @echo off > "%LAUNCHER_PATH%"
+echo python "%INSTALL_DIR%\ascii-player.py" %%* >> "%LAUNCHER_PATH%"
 
 :: 6. Add to PATH
 echo [4/4] Adding to PATH...
@@ -66,13 +66,16 @@ if "%IS_ADMIN%"=="1" (
     set "PATH_SCOPE=User"
 )
 
+:: Use PowerShell for robust PATH modification, avoiding batch syntax pitfalls
 powershell -Command ^
-    "$currentPath = [Environment]::GetEnvironmentVariable('Path', '%PATH_SCOPE%'); " ^
-    "if ($currentPath -notlike '*%INSTALL_DIR%*') { " ^
-    "    [Environment]::SetEnvironmentVariable('Path', $currentPath + ';%INSTALL_DIR%', '%PATH_SCOPE%'); " ^
-    "    Write-Host '[OK] %PATH_SCOPE% PATH updated successfully.' -ForegroundColor Green; " ^
+    "$dir = '%INSTALL_DIR%'; " ^
+    "$scope = '%PATH_SCOPE%'; " ^
+    "$currentPath = [Environment]::GetEnvironmentVariable('Path', $scope); " ^
+    "if ($currentPath -notlike '*'+$dir+'*') { " ^
+    "    [Environment]::SetEnvironmentVariable('Path', $currentPath + ';' + $dir, $scope); " ^
+    "    Write-Host '[OK] ' $scope ' PATH updated successfully.' -ForegroundColor Green; " ^
     "} else { " ^
-    "    Write-Host '[INFO] Directory already in %PATH_SCOPE% PATH.' -ForegroundColor Cyan; " ^
+    "    Write-Host '[INFO] Directory already in ' $scope ' PATH.' -ForegroundColor Cyan; " ^
     "}"
 
 if errorlevel 1 (
@@ -86,7 +89,7 @@ echo   INSTALLATION COMPLETE!
 echo ============================================================
 echo.
 echo You can now run the player from ANY terminal using:
-echo    ascii-player <video_file_or_url> [--terminal]
+echo    ascii-player ^<video_file_or_url^> [--terminal]
 echo.
 echo Note: You MUST restart your terminal for PATH changes to take effect.
 echo.
