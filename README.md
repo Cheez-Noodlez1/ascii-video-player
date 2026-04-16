@@ -11,6 +11,7 @@ A retro-style Windows application that converts any video file or HTML file into
 ## ✨ Features
 
 - **Real-time ASCII Conversion:** High-performance conversion of video frames into ASCII characters based on luminance.
+- **Live Website Streaming:** Stream any website in real-time as ASCII art using the `--stream` flag.
 - **HTML Support:** Render HTML files directly into ASCII text for a unique terminal viewing experience.
 - **Terminal Mode:** Run the tool entirely in the terminal without a GUI for quick previews.
 - **Multiple Color Modes:**
@@ -96,6 +97,9 @@ ASCIIPlayer.exe movie.mp4 true
 # Terminal mode (for videos or HTML)
 ASCIIPlayer.exe movie.mp4 --terminal
 ASCIIPlayer.exe index.html --terminal
+
+# 🌐 Live Website Streaming (Real-time)
+ASCIIPlayer.exe https://google.com --stream
 
 # 🛠️ Install to system PATH automatically
 python src/main.py --install

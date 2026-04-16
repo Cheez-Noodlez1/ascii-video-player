@@ -1,13 +1,14 @@
 """
 ASCII Video Player - Standalone Windows App
-A retro-style Windows application that converts any video file or HTML file into real-time ASCII art.
-Version: 1.1.0
+A retro-style Windows application that converts any video file, HTML file, or LIVE WEBSITE into real-time ASCII art.
+Version: 1.2.0
 Author: Cheez-Noodlez1
 """
 
 import sys
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __author__ = "Cheez-Noodlez1"
+
 import cv2
 import numpy as np
 import os
@@ -26,18 +27,23 @@ ASCII_CHARS = "@%#*+=-:. "
 
 
 class VideoThread(QThread):
-    """Thread to process video frames or HTML content and send them to the UI."""
+    """Thread to process video frames, HTML content, or LIVE WEBSITES and send them to the UI."""
     frame_ready = pyqtSignal(str, QColor)
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, is_streaming: bool = False):
         super().__init__()
         self.file_path = file_path
         self.is_running = True
+        self.is_streaming = is_streaming
         self.color_mode = "Matrix Green"
         self.temp_audio = "temp_audio.wav"
 
     def run(self) -> None:
-        """Main loop for processing video frames or static HTML content."""
+        """Main loop for processing video frames, static HTML content, or live web streaming."""
+        if self.is_streaming:
+            self._process_web_stream()
+            return
+
         if self.file_path.lower().endswith(('.html', '.htm')):
             self._process_html()
             return
@@ -120,6 +126,37 @@ class VideoThread(QThread):
         except Exception as e:
             self.frame_ready.emit(f"Error loading HTML: {e}", QColor(255, 0, 0))
 
+    def _process_web_stream(self) -> None:
+        """Live stream a website as ASCII frames using Selenium."""
+        try:
+            from selenium import webdriver
+            from selenium.webdriver.chrome.options import Options
+            from webdriver_manager.chrome import ChromeDriverManager
+            from selenium.webdriver.chrome.service import Service
+
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--window-size=1280,720")
+            
+            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+            driver.get(self.file_path)
+
+            while self.is_running:
+                # Capture screenshot of the website
+                screenshot = driver.get_screenshot_as_png()
+                nparr = np.frombuffer(screenshot, np.uint8)
+                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                
+                # Convert to ASCII
+                content, color = self._process_frame(frame)
+                self.frame_ready.emit(content, color)
+                
+                time.sleep(0.5) # Refresh rate for web stream
+            
+            driver.quit()
+        except Exception as e:
+            self.frame_ready.emit(f"Error streaming website: {e}", QColor(255, 0, 0))
+
     def _process_frame(self, frame: np.ndarray) -> Tuple[str, QColor]:
         """Convert a video frame to ASCII art."""
         height, width = frame.shape[:2]
@@ -188,7 +225,7 @@ class ASCIIVideoPlayer(QMainWindow):
         self.ascii_display.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
         self.ascii_display.setFont(QFont("Courier New", 6))
         self.ascii_display.setStyleSheet("background-color: black; border: none;")
-        self.ascii_display.setPlaceholderText("Drop a video or HTML file to start...")
+        self.ascii_display.setPlaceholderText("Drop a video, HTML file, or live URL to start...")
         layout.addWidget(self.ascii_display)
 
         # Controls
@@ -231,13 +268,13 @@ class ASCIIVideoPlayer(QMainWindow):
         if file_path:
             self.start_playback(file_path)
 
-    def start_playback(self, path: str) -> None:
+    def start_playback(self, path: str, is_streaming: bool = False) -> None:
         """Initialize and start the playback thread."""
         if self.video_thread:
             self.video_thread.stop()
             self.video_thread.wait()
 
-        self.video_thread = VideoThread(path)
+        self.video_thread = VideoThread(path, is_streaming=is_streaming)
         self.video_thread.color_mode = self.current_mode
         self.video_thread.frame_ready.connect(self.update_display)
         self.video_thread.start()
@@ -260,8 +297,8 @@ class ASCIIVideoPlayer(QMainWindow):
             self.video_thread.color_mode = self.current_mode
 
 
-def run_in_terminal(file_path: str):
-    """Render the file or URL directly to the terminal."""
+def run_in_terminal(file_path: str, is_live_stream: bool = False):
+    """Render the file, URL, or LIVE WEBSITE directly to the terminal."""
     # Check if it's a URL
     is_url = file_path.startswith(('http://', 'https://'))
     
@@ -269,6 +306,51 @@ def run_in_terminal(file_path: str):
         print(f"File not found: {file_path}")
         return
 
+    # Handle LIVE WEBSITE streaming
+    if is_live_stream:
+        try:
+            from selenium import webdriver
+            from selenium.webdriver.chrome.options import Options
+            from webdriver_manager.chrome import ChromeDriverManager
+            from selenium.webdriver.chrome.service import Service
+
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--window-size=1280,720")
+            
+            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+            driver.get(file_path)
+
+            print(f"--- Streaming {file_path} in ASCII ---")
+            while True:
+                screenshot = driver.get_screenshot_as_png()
+                nparr = np.frombuffer(screenshot, np.uint8)
+                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                
+                # Convert to ASCII
+                height, width = frame.shape[:2]
+                new_width = 80
+                new_height = int((height / width) * new_width * 0.5)
+                resized_frame = cv2.resize(frame, (new_width, new_height))
+                gray_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2GRAY)
+
+                ascii_frame = ""
+                for y in range(new_height):
+                    for x in range(new_width):
+                        char_idx = int(gray_frame[y, x] / 256 * len(ASCII_CHARS))
+                        ascii_frame += ASCII_CHARS[char_idx]
+                    ascii_frame += "\n"
+
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(ascii_frame)
+                time.sleep(0.5)
+        except KeyboardInterrupt:
+            driver.quit()
+        except Exception as e:
+            print(f"Error streaming website: {e}")
+        return
+
+    # Handle static HTML or URL
     if is_url or file_path.lower().endswith(('.html', '.htm')):
         try:
             import html2text
@@ -357,14 +439,23 @@ def main():
                 print("[ERROR] Installer script not found. Please run from the repository root.")
         return
 
+    # Check for LIVE STREAM flag
+    is_live_stream = "--stream" in sys.argv
+
     # Check if running in terminal mode (no GUI requested or via CLI)
     if len(sys.argv) > 1:
-        file_path = sys.argv[1]
+        file_path = None
+        # Find the file/url argument (not a flag)
+        for arg in sys.argv[1:]:
+            if not arg.startswith("--"):
+                file_path = arg
+                break
         
-        # If "--terminal" flag is present, run in terminal
-        if "--terminal" in sys.argv:
-            run_in_terminal(file_path)
-            return
+        if file_path:
+            # If "--terminal" flag is present, run in terminal
+            if "--terminal" in sys.argv or is_live_stream:
+                run_in_terminal(file_path, is_live_stream=is_live_stream)
+                return
 
     app = QApplication(sys.argv)
     window = ASCIIVideoPlayer()
@@ -372,15 +463,20 @@ def main():
 
     # Handle Command Line Arguments for GUI startup
     if len(sys.argv) > 1:
-        file_path = sys.argv[1]
-        if os.path.exists(file_path):
+        file_path = None
+        for arg in sys.argv[1:]:
+            if not arg.startswith("--"):
+                file_path = arg
+                break
+        
+        if file_path and os.path.exists(file_path):
             # Check for 'true' or 'truecolor' flag
             if any(arg.lower() in ["true", "truecolor"] for arg in sys.argv):
                 window.current_mode = "True Color"
                 window.btn_mode.setText("Switch Color: True")
 
             # Start playback instantly
-            window.start_playback(file_path)
+            window.start_playback(file_path, is_streaming=is_live_stream)
 
     sys.exit(app.exec())
 
