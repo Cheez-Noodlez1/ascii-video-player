@@ -23,34 +23,41 @@ A retro-style Windows application that converts any video file or HTML file into
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start & Installation
 
-### For Users (Download EXE)
-1. Go to the [Releases](https://github.com/Cheez-Noodlez1/ascii-video-player/releases) page.
-2. Download `ASCIIPlayer.exe`.
-3. Run the application and drag any video file into the window!
-
-### For Developers (Source Code)
-
-#### Prerequisites
-- Python 3.8 or later
-- [OpenCV](https://opencv.org/)
-- [PyQt6](https://riverbankcomputing.com/software/pyqt/)
-
-#### Installation
+### 💻 For Windows Users
 1. Clone the repository:
    ```bash
    git clone https://github.com/Cheez-Noodlez1/ascii-video-player.git
    cd ascii-video-player
    ```
-2. Install dependencies:
+2. Double-click **`INSTALL_WINDOWS.bat`**.
+3. This will install all dependencies and add `ascii-player` to your system PATH.
+4. Open a new terminal and type:
    ```bash
-   pip install -r requirements.txt
+   ascii-player movie.mp4 --terminal
    ```
-3. Run the application:
+
+### 🐧 For Linux Users
+1. Clone the repository:
    ```bash
-   python src/main.py
+   git clone https://github.com/Cheez-Noodlez1/ascii-video-player.git
+   cd ascii-video-player
    ```
+2. Run the installer:
+   ```bash
+   chmod +x install_linux.sh
+   ./install_linux.sh
+   ```
+3. Restart your terminal and type:
+   ```bash
+   ascii-player movie.mp4 --terminal
+   ```
+
+### ⚡ Run Instantly with curl (No Installation)
+```bash
+curl -sSL https://raw.githubusercontent.com/Cheez-Noodlez1/ascii-video-player/master/run_ascii.sh | bash -s -- https://example.com
+```
 
 ---
 

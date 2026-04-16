@@ -1,9 +1,13 @@
 """
 ASCII Video Player - Standalone Windows App
 A retro-style Windows application that converts any video file or HTML file into real-time ASCII art.
+Version: 1.1.0
+Author: Cheez-Noodlez1
 """
 
 import sys
+__version__ = "1.1.0"
+__author__ = "Cheez-Noodlez1"
 import cv2
 import numpy as np
 import os
@@ -326,6 +330,12 @@ def run_in_terminal(file_path: str):
 
 def main():
     """Application entry point."""
+    # Handle version request
+    if "--version" in sys.argv or "-v" in sys.argv:
+        print(f"ASCII Video Player v{__version__}")
+        print(f"Created by {__author__}")
+        return
+
     # Check if running in terminal mode (no GUI requested or via CLI)
     if len(sys.argv) > 1:
         file_path = sys.argv[1]
