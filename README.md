@@ -48,7 +48,11 @@ A retro-style Windows application that converts any video file or HTML file into
    chmod +x install_linux.sh
    ./install_linux.sh
    ```
-3. Restart your terminal and type:
+3. Alternatively, run the tool with the install flag:
+   ```bash
+   python3 src/main.py --install
+   ```
+4. Restart your terminal and type:
    ```bash
    ascii-player movie.mp4 --terminal
    ```
@@ -87,6 +91,9 @@ ASCIIPlayer.exe movie.mp4 true
 # Terminal mode (for videos or HTML)
 ASCIIPlayer.exe movie.mp4 --terminal
 ASCIIPlayer.exe index.html --terminal
+
+# 🛠️ Install to system PATH automatically
+python src/main.py --install
 
 # 🚀 Run instantly with curl (no installation needed)
 # For local files:

@@ -336,6 +336,27 @@ def main():
         print(f"Created by {__author__}")
         return
 
+    # Handle installation request
+    if "--install" in sys.argv:
+        print("--- Initiating System-wide Installation ---")
+        import subprocess
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        repo_root = os.path.dirname(script_dir)
+        
+        if os.name == 'nt':
+            installer_path = os.path.join(repo_root, "INSTALL_WINDOWS.bat")
+            if os.path.exists(installer_path):
+                subprocess.call([installer_path])
+            else:
+                print("[ERROR] Installer script not found. Please run from the repository root.")
+        else:
+            installer_path = os.path.join(repo_root, "install_linux.sh")
+            if os.path.exists(installer_path):
+                subprocess.call(["bash", installer_path])
+            else:
+                print("[ERROR] Installer script not found. Please run from the repository root.")
+        return
+
     # Check if running in terminal mode (no GUI requested or via CLI)
     if len(sys.argv) > 1:
         file_path = sys.argv[1]

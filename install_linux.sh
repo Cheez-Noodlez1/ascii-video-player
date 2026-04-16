@@ -35,7 +35,7 @@ mkdir -p "$INSTALL_DIR"
 echo "[3/4] Creating system launcher..."
 cat <<EOF > "$INSTALL_DIR/ascii-player"
 #!/bin/bash
-python3 "$HOME/.local/share/ascii-video-player/main.py" "\$@"
+python3 "\$HOME/.local/share/ascii-video-player/main.py" "\$@"
 EOF
 chmod +x "$INSTALL_DIR/ascii-player"
 
@@ -47,9 +47,17 @@ cp src/main.py "$HOME/.local/share/ascii-video-player/main.py"
 echo "[4/4] Verifying PATH..."
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     echo "Adding $INSTALL_DIR to PATH in your .bashrc/.zshrc..."
-    echo "export PATH=\$PATH:$INSTALL_DIR" >> "$HOME/.bashrc"
+    
+    # Check if export is already in .bashrc
+    if ! grep -q "export PATH=\$PATH:$INSTALL_DIR" "$HOME/.bashrc"; then
+        echo "export PATH=\$PATH:$INSTALL_DIR" >> "$HOME/.bashrc"
+    fi
+    
+    # Check if export is already in .zshrc if it exists
     if [ -f "$HOME/.zshrc" ]; then
-        echo "export PATH=\$PATH:$INSTALL_DIR" >> "$HOME/.zshrc"
+        if ! grep -q "export PATH=\$PATH:$INSTALL_DIR" "$HOME/.zshrc"; then
+            echo "export PATH=\$PATH:$INSTALL_DIR" >> "$HOME/.zshrc"
+        fi
     fi
     echo "[OK] PATH updated. Please restart your terminal or run 'source ~/.bashrc'."
 else

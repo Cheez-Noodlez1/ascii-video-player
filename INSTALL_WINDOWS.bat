@@ -42,13 +42,19 @@ echo python "%%USERPROFILE%%\.ascii-video-player\ascii-player.py" %%*
 
 :: 5. Add to User PATH
 echo [4/4] Adding to User PATH...
-:: Use PowerShell to safely add the directory to the user's PATH if it's not already there
-powershell -Command "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';%INSTALL_DIR%', 'User')"
+:: Use PowerShell to safely check and add the directory to the user's PATH
+powershell -Command ^
+    "$currentPath = [Environment]::GetEnvironmentVariable('Path', 'User'); " ^
+    "if ($currentPath -notlike '*%INSTALL_DIR%*') { " ^
+    "    [Environment]::SetEnvironmentVariable('Path', $currentPath + ';%INSTALL_DIR%', 'User'); " ^
+    "    Write-Host '[OK] PATH updated successfully.' -ForegroundColor Green; " ^
+    "} else { " ^
+    "    Write-Host '[INFO] Directory already in PATH.' -ForegroundColor Cyan; " ^
+    "}"
+
 if errorlevel 1 (
     echo [WARNING] Could not automatically update PATH. 
     echo Please manually add %INSTALL_DIR% to your environment variables.
-) else (
-    echo [OK] PATH updated successfully.
 )
 
 echo.
@@ -59,6 +65,6 @@ echo.
 echo You can now run the player from ANY terminal using:
 echo    ascii-player <video_file_or_url> [--terminal]
 echo.
-echo Note: You may need to restart your terminal for PATH changes to take effect.
+echo Note: You MUST restart your terminal for PATH changes to take effect.
 echo.
 pause
