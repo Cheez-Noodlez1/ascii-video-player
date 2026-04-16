@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+echo "Setting up Python dependencies for ascii-stream..."
+pip3 install html2text webdriver-manager --quiet
+
+echo "Installation complete. You can now use the 'ascii-stream' command."
+exit 0

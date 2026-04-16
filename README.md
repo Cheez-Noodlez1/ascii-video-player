@@ -39,6 +39,18 @@ A retro-style Windows application that converts any video file or HTML file into
    ```
 
 ### 🐧 For Linux Users
+
+**Method 1: APT Installation (Recommended)**
+Install the tool using the familiar `apt` command:
+```bash
+curl -sSL https://raw.githubusercontent.com/Cheez-Noodlez1/ascii-video-player/master/apt_install.sh | sudo bash
+```
+Now you can run the tool from anywhere using:
+```bash
+ascii-stream movie.mp4 --terminal
+```
+
+**Method 2: Manual Installation**
 1. Clone the repository:
    ```bash
    git clone https://github.com/Cheez-Noodlez1/ascii-video-player.git
