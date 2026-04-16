@@ -1,6 +1,6 @@
 """
 ASCII Video Player - Standalone Windows App
-A retro-style Windows application that converts any video file into real-time ASCII art.
+A retro-style Windows application that converts any video file or HTML file into real-time ASCII art.
 """
 
 import sys
@@ -22,25 +22,30 @@ ASCII_CHARS = "@%#*+=-:. "
 
 
 class VideoThread(QThread):
-    """Thread to process video frames and send them to the UI."""
+    """Thread to process video frames or HTML content and send them to the UI."""
     frame_ready = pyqtSignal(str, QColor)
 
-    def __init__(self, video_path: str):
+    def __init__(self, file_path: str):
         super().__init__()
-        self.video_path = video_path
+        self.file_path = file_path
         self.is_running = True
         self.color_mode = "Matrix Green"
         self.temp_audio = "temp_audio.wav"
 
     def run(self) -> None:
-        """Main loop for processing video frames and audio."""
+        """Main loop for processing video frames or static HTML content."""
+        if self.file_path.lower().endswith(('.html', '.htm')):
+            self._process_html()
+            return
+
+        # Video processing logic
         has_audio = False
         try:
             # Conditional imports for optional audio support
             from moviepy.editor import VideoFileClip
             import pygame
 
-            video = VideoFileClip(self.video_path)
+            video = VideoFileClip(self.file_path)
             if video.audio:
                 video.audio.write_audiofile(
                     self.temp_audio, codec='pcm_s16le', verbose=False, logger=None
@@ -53,9 +58,9 @@ class VideoThread(QThread):
         except Exception as e:
             print(f"Audio extraction failed: {e}")
 
-        cap = cv2.VideoCapture(self.video_path)
+        cap = cv2.VideoCapture(self.file_path)
         if not cap.isOpened():
-            print(f"Failed to open video: {self.video_path}")
+            print(f"Failed to open video: {self.file_path}")
             return
 
         fps = cap.get(cv2.CAP_PROP_FPS)
@@ -94,6 +99,22 @@ class VideoThread(QThread):
                 os.remove(self.temp_audio)
             except OSError:
                 pass
+
+    def _process_html(self) -> None:
+        """Read HTML file, convert to text, and emit."""
+        try:
+            import html2text
+            with open(self.file_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            h = html2text.HTML2Text()
+            h.ignore_links = False
+            text = h.handle(html_content)
+            
+            color = QColor(0, 255, 0) if self.color_mode == "Matrix Green" else QColor(200, 200, 200)
+            self.frame_ready.emit(text, color)
+        except Exception as e:
+            self.frame_ready.emit(f"Error loading HTML: {e}", QColor(255, 0, 0))
 
     def _process_frame(self, frame: np.ndarray) -> Tuple[str, QColor]:
         """Convert a video frame to ASCII art."""
@@ -163,13 +184,13 @@ class ASCIIVideoPlayer(QMainWindow):
         self.ascii_display.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
         self.ascii_display.setFont(QFont("Courier New", 6))
         self.ascii_display.setStyleSheet("background-color: black; border: none;")
-        self.ascii_display.setPlaceholderText("Drop a video file to start...")
+        self.ascii_display.setPlaceholderText("Drop a video or HTML file to start...")
         layout.addWidget(self.ascii_display)
 
         # Controls
         controls_layout = QHBoxLayout()
 
-        self.btn_open = QPushButton("Open Video")
+        self.btn_open = QPushButton("Open File")
         self.btn_open.clicked.connect(self.open_file)
         self.btn_open.setStyleSheet(
             "padding: 10px; background-color: #1a1a1a; "
@@ -196,18 +217,18 @@ class ASCIIVideoPlayer(QMainWindow):
     def dropEvent(self, event) -> None:
         files = [u.toLocalFile() for u in event.mimeData().urls()]
         if files:
-            self.start_video(files[0])
+            self.start_playback(files[0])
 
     def open_file(self) -> None:
-        """Open a file dialog to select a video."""
+        """Open a file dialog to select a video or HTML file."""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Open Video", "", "Video Files (*.mp4 *.avi *.mov *.mkv)"
+            self, "Open File", "", "Supported Files (*.mp4 *.avi *.mov *.mkv *.html *.htm)"
         )
         if file_path:
-            self.start_video(file_path)
+            self.start_playback(file_path)
 
-    def start_video(self, path: str) -> None:
-        """Initialize and start the video processing thread."""
+    def start_playback(self, path: str) -> None:
+        """Initialize and start the playback thread."""
         if self.video_thread:
             self.video_thread.stop()
             self.video_thread.wait()
@@ -235,23 +256,89 @@ class ASCIIVideoPlayer(QMainWindow):
             self.video_thread.color_mode = self.current_mode
 
 
+def run_in_terminal(file_path: str):
+    """Render the file directly to the terminal."""
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        return
+
+    if file_path.lower().endswith(('.html', '.htm')):
+        try:
+            import html2text
+            with open(file_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            h = html2text.HTML2Text()
+            print(h.handle(html_content))
+        except ImportError:
+            print("Error: html2text not installed. Run 'pip install html2text'")
+        except Exception as e:
+            print(f"Error reading HTML: {e}")
+        return
+
+    # Video Terminal Rendering
+    cap = cv2.VideoCapture(file_path)
+    if not cap.isOpened():
+        print(f"Failed to open video: {file_path}")
+        return
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    delay = 1.0 / fps if fps > 0 else 0.033
+
+    try:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            height, width = frame.shape[:2]
+            new_width = 80
+            new_height = int((height / width) * new_width * 0.5)
+            resized_frame = cv2.resize(frame, (new_width, new_height))
+            gray_frame = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2GRAY)
+
+            ascii_frame = ""
+            for y in range(new_height):
+                for x in range(new_width):
+                    char_idx = int(gray_frame[y, x] / 256 * len(ASCII_CHARS))
+                    ascii_frame += ASCII_CHARS[char_idx]
+                ascii_frame += "\n"
+
+            # Clear screen and print
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print(ascii_frame)
+            time.sleep(delay)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        cap.release()
+
+
 def main():
     """Application entry point."""
+    # Check if running in terminal mode (no GUI requested or via CLI)
+    if len(sys.argv) > 1:
+        file_path = sys.argv[1]
+        
+        # If "--terminal" flag is present, run in terminal
+        if "--terminal" in sys.argv:
+            run_in_terminal(file_path)
+            return
+
     app = QApplication(sys.argv)
     window = ASCIIVideoPlayer()
     window.show()
 
-    # Handle Command Line Arguments
+    # Handle Command Line Arguments for GUI startup
     if len(sys.argv) > 1:
-        video_path = sys.argv[1]
-        if os.path.exists(video_path):
+        file_path = sys.argv[1]
+        if os.path.exists(file_path):
             # Check for 'true' or 'truecolor' flag
-            if len(sys.argv) > 2 and sys.argv[2].lower() in ["true", "truecolor"]:
+            if any(arg.lower() in ["true", "truecolor"] for arg in sys.argv):
                 window.current_mode = "True Color"
                 window.btn_mode.setText("Switch Color: True")
 
             # Start playback instantly
-            window.start_video(video_path)
+            window.start_playback(file_path)
 
     sys.exit(app.exec())
 

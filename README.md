@@ -4,13 +4,15 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Platform: Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](https://www.microsoft.com/windows)
 
-A retro-style Windows application that converts any video file into real-time ASCII art. Watch your favorite movies, clips, or home videos rendered in a grid of text characters with synchronized audio support.
+A retro-style Windows application that converts any video file or HTML file into real-time ASCII art. Watch your favorite movies, clips, or home videos rendered in a grid of text characters with synchronized audio support, or view HTML content directly in your terminal.
 
 ---
 
 ## ✨ Features
 
 - **Real-time ASCII Conversion:** High-performance conversion of video frames into ASCII characters based on luminance.
+- **HTML Support:** Render HTML files directly into ASCII text for a unique terminal viewing experience.
+- **Terminal Mode:** Run the tool entirely in the terminal without a GUI for quick previews.
 - **Multiple Color Modes:**
   - 🟢 **Matrix Green:** The classic "hacker" aesthetic.
   - ⚪ **Grayscale:** Traditional high-contrast black and white.
@@ -75,6 +77,10 @@ ASCIIPlayer.exe movie.mp4
 
 # Full Color mode
 ASCIIPlayer.exe movie.mp4 true
+
+# Terminal mode (for videos or HTML)
+ASCIIPlayer.exe movie.mp4 --terminal
+ASCIIPlayer.exe index.html --terminal
 ```
 
 **Pro Tip:** Rename the EXE to `ascii-stream.exe` and add it to your System PATH to use it from anywhere!
