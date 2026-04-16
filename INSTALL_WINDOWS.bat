@@ -41,32 +41,31 @@ if errorlevel 1 (
 echo [OK] Dependencies installed.
 
 :: 4. Create a permanent installation directory
-if "%IS_ADMIN%"=="1" (
-    set "INSTALL_DIR=%ProgramFiles%\ASCII-Video-Player"
-) else (
-    set "INSTALL_DIR=%USERPROFILE%\.ascii-video-player"
-)
+:: We use separate blocks to avoid issues with parentheses in ProgramFiles path
+if "%IS_ADMIN%"=="1" goto ADMIN_PATH
+set "INSTALL_DIR=%USERPROFILE%\.ascii-video-player"
+goto SETUP_DIR
 
-echo [2/4] Setting up installation directory at %INSTALL_DIR%...
+:ADMIN_PATH
+set "INSTALL_DIR=%ProgramFiles%\ASCII-Video-Player"
+
+:SETUP_DIR
+echo [2/4] Setting up installation directory at "%INSTALL_DIR%"...
 if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 copy /Y "src\main.py" "%INSTALL_DIR%\ascii-player.py" >nul
 
 :: 5. Create a launcher batch file
 echo [3/4] Creating system launcher...
-:: We use a temporary file to avoid issues with nested parentheses in echo
 set "LAUNCHER_PATH=%INSTALL_DIR%\ascii-player.bat"
+:: Create the file with basic echo commands, avoiding complex blocks
 echo @echo off > "%LAUNCHER_PATH%"
 echo python "%INSTALL_DIR%\ascii-player.py" %%* >> "%LAUNCHER_PATH%"
 
 :: 6. Add to PATH
 echo [4/4] Adding to PATH...
-if "%IS_ADMIN%"=="1" (
-    set "PATH_SCOPE=Machine"
-) else (
-    set "PATH_SCOPE=User"
-)
+if "%IS_ADMIN%"=="1" (set "PATH_SCOPE=Machine") else (set "PATH_SCOPE=User")
 
-:: Use PowerShell for robust PATH modification, avoiding batch syntax pitfalls
+:: Use PowerShell with properly escaped variables for robust PATH modification
 powershell -Command ^
     "$dir = '%INSTALL_DIR%'; " ^
     "$scope = '%PATH_SCOPE%'; " ^
@@ -80,7 +79,7 @@ powershell -Command ^
 
 if errorlevel 1 (
     echo [WARNING] Could not automatically update PATH. 
-    echo Please manually add %INSTALL_DIR% to your environment variables.
+    echo Please manually add "%INSTALL_DIR%" to your environment variables.
 )
 
 echo.
