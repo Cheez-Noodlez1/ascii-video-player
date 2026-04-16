@@ -31,11 +31,10 @@ A retro-style Windows application that converts any video file or HTML file into
    git clone https://github.com/Cheez-Noodlez1/ascii-video-player.git
    cd ascii-video-player
    ```
-2. Double-click **`INSTALL_WINDOWS.bat`**.
-3. This will install all dependencies and add `ascii-player` to your system PATH.
-4. Open a new terminal and type:
+2. Double-click **`ASCIIPlayer.bat`** to run directly or use **`INSTALL_WINDOWS.bat`** to add it to your system PATH.
+3. You can now run the player from any terminal using:
    ```bash
-   ascii-player movie.mp4 --terminal
+   ASCIIPlayer.bat movie.mp4 --terminal
    ```
 
 ### 🐧 For Linux Users
