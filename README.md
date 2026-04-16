@@ -38,17 +38,14 @@ A retro-style Windows application that converts any video file or HTML file into
    ASCIIPlayer.bat movie.mp4 --terminal
    ```
 
-### 🐧 For Linux Users
+### 🐧 For Linux Users (Global "sudo" Package)
 
 **Method 1: APT Installation (Recommended)**
-Install the tool using the familiar `apt` command:
+Install the tool globally using the familiar `apt` command:
 ```bash
 curl -sSL https://raw.githubusercontent.com/Cheez-Noodlez1/ascii-video-player/master/apt_install.sh | sudo bash
 ```
-Now you can run the tool from anywhere using:
-```bash
-ascii-stream movie.mp4 --terminal
-```
+This will install the **`ascii-stream`** command system-wide.
 
 **Method 2: Manual Installation**
 1. Clone the repository:
@@ -56,14 +53,14 @@ ascii-stream movie.mp4 --terminal
    git clone https://github.com/Cheez-Noodlez1/ascii-video-player.git
    cd ascii-video-player
    ```
-2. Run the installer:
+2. Run the installer (requires sudo for system-wide access):
    ```bash
    chmod +x install_linux.sh
-   ./install_linux.sh
+   sudo ./install_linux.sh
    ```
 3. Alternatively, run the tool with the install flag:
    ```bash
-   python3 src/main.py --install
+   sudo python3 src/main.py --install
    ```
 4. Restart your terminal and type:
    ```bash

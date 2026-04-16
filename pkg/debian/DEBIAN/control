@@ -1,9 +1,11 @@
 Package: ascii-stream
-Version: 1.2.0
+Version: 1.2.1
 Section: utils
 Priority: optional
 Architecture: all
 Maintainer: Cheez-Noodlez1 <your-email@example.com>
-Depends: python3, python3-pip, python3-pyqt6, python3-opencv, python3-numpy, python3-pygame, python3-requests, python3-selenium
-Description: A retro-style application that converts video, HTML, and live websites into real-time ASCII art.
- This package provides the 'ascii-stream' command to view media in your terminal.
+Depends: python3 (>= 3.8), python3-pip, python3-pyqt6, python3-opencv, python3-numpy, python3-pygame, python3-requests, python3-selenium
+Description: A professional ASCII art media player and live website streamer.
+ This tool provides the 'ascii-stream' command to convert videos, static HTML,
+ and live web content into high-performance ASCII art directly in the terminal.
+ It supports real-time streaming, audio synchronization, and multiple color modes.

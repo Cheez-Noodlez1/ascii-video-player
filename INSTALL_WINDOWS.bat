@@ -1,13 +1,26 @@
 @echo off
 setlocal enabledelayedexpansion
 
-title ASCII Video Player - Professional Installer
+title ASCII Video Player - Professional Administrative Installer
 echo ============================================================
-echo   ASCII Video Player - Installation Wizard
+echo   ASCII Video Player - Installation Wizard (Admin Mode)
 echo ============================================================
 echo.
 
-:: 1. Check for Python
+:: 1. Check for Administrative Privileges
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [WARNING] This installer is not running with Administrative privileges.
+    echo To install to System PATH (Global), please run this script as Administrator.
+    echo Proceeding with User-level installation...
+    set "IS_ADMIN=0"
+) else (
+    echo [OK] Running with Administrative privileges.
+    set "IS_ADMIN=1"
+)
+echo.
+
+:: 2. Check for Python
 python --version >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Python is not installed or not in PATH.
@@ -16,7 +29,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-:: 2. Install dependencies
+:: 3. Install dependencies
 echo [1/4] Installing required Python packages...
 python -m pip install --upgrade pip --quiet
 python -m pip install -r requirements.txt --quiet
@@ -27,29 +40,39 @@ if errorlevel 1 (
 )
 echo [OK] Dependencies installed.
 
-:: 3. Create a permanent installation directory
-set "INSTALL_DIR=%USERPROFILE%\.ascii-video-player"
+:: 4. Create a permanent installation directory
+if "%IS_ADMIN%"=="1" (
+    set "INSTALL_DIR=%ProgramFiles%\ASCII-Video-Player"
+) else (
+    set "INSTALL_DIR=%USERPROFILE%\.ascii-video-player"
+)
+
 echo [2/4] Setting up installation directory at %INSTALL_DIR%...
 if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 copy /Y "src\main.py" "%INSTALL_DIR%\ascii-player.py" >nul
 
-:: 4. Create a launcher batch file
+:: 5. Create a launcher batch file
 echo [3/4] Creating system launcher...
 (
 echo @echo off
-echo python "%%USERPROFILE%%\.ascii-video-player\ascii-player.py" %%*
+echo python "%INSTALL_DIR%\ascii-player.py" %%*
 ) > "%INSTALL_DIR%\ascii-player.bat"
 
-:: 5. Add to User PATH
-echo [4/4] Adding to User PATH...
-:: Use PowerShell to safely check and add the directory to the user's PATH
+:: 6. Add to PATH
+echo [4/4] Adding to PATH...
+if "%IS_ADMIN%"=="1" (
+    set "PATH_SCOPE=Machine"
+) else (
+    set "PATH_SCOPE=User"
+)
+
 powershell -Command ^
-    "$currentPath = [Environment]::GetEnvironmentVariable('Path', 'User'); " ^
+    "$currentPath = [Environment]::GetEnvironmentVariable('Path', '%PATH_SCOPE%'); " ^
     "if ($currentPath -notlike '*%INSTALL_DIR%*') { " ^
-    "    [Environment]::SetEnvironmentVariable('Path', $currentPath + ';%INSTALL_DIR%', 'User'); " ^
-    "    Write-Host '[OK] PATH updated successfully.' -ForegroundColor Green; " ^
+    "    [Environment]::SetEnvironmentVariable('Path', $currentPath + ';%INSTALL_DIR%', '%PATH_SCOPE%'); " ^
+    "    Write-Host '[OK] %PATH_SCOPE% PATH updated successfully.' -ForegroundColor Green; " ^
     "} else { " ^
-    "    Write-Host '[INFO] Directory already in PATH.' -ForegroundColor Cyan; " ^
+    "    Write-Host '[INFO] Directory already in %PATH_SCOPE% PATH.' -ForegroundColor Cyan; " ^
     "}"
 
 if errorlevel 1 (
